@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// SQLite for local development — switch to PostgreSQL for production
+// PostgreSQL datasource:
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                   String   @id @default(uuid())
+  name                 String
+  gender               String
+  phone                String
+  email                String
+  nationality          String
+  birthday             DateTime
+  passportNumber       String   // AES encrypted, stored as base64
+  proficientLanguages  String   // JSON array stored as string (SQLite compat)
+  hskLevel             String
+  englishProficiency   String
+  university           String
+  major                String
+  highestDegree        String
+  currentAcademicYear  String
+  graduationDate       DateTime
+  postGraduationPlan   String
+  intendedCity         String
+  familyBusiness       String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([nationality])
+  @@index([highestDegree])
+  @@index([hskLevel])
+  @@index([intendedCity])
+  @@index([createdAt])
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

@@ -1,0 +1,38 @@
+/* === YiwuTrade Admin — Global Styles === */
+
+:root {
+  --color-primary: #d00000;
+  --color-primary-dark: #a00000;
+  --color-primary-light: #ffe5e5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+}
+
+body {
+  color: #303133;
+  background-color: #f5f7fa;
+  line-height: 1.6;
+}
+
+/* Element Plus theme override — brand red */
+:root {
+  --el-color-primary: #d00000;
+  --el-color-primary-dark-2: #a00000;
+  --el-color-primary-light-3: #e06060;
+  --el-color-primary-light-5: #f0a0a0;
+  --el-color-primary-light-7: #f8d0d0;
+  --el-color-primary-light-8: #fce8e8;
+  --el-color-primary-light-9: #ffe5e5;
+}
