@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { applicationSchema } from '../validators/application.schema';
+import { applicationSchema, applicationUpdateSchema } from '../validators/application.schema';
 import { AppError } from '../middleware/error-handler';
 import * as appService from '../services/application.service';
 
@@ -47,6 +47,19 @@ export async function detail(req: Request, res: Response, next: NextFunction) {
       throw new AppError('Application not found', 404);
     }
     res.json({ success: true, data: item });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = applicationUpdateSchema.parse(req.body);
+    const updated = await appService.updateApplication(req.params.id, data);
+    if (!updated) {
+      throw new AppError('Application not found', 404);
+    }
+    res.json({ success: true, data: updated });
   } catch (err) {
     next(err);
   }

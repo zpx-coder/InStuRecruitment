@@ -9,9 +9,11 @@ const api = axios.create({
   },
 });
 
-// Request interceptor — attach JWT token
+// Request interceptor — attach JWT token (check both storages)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token =
+    localStorage.getItem('token') ||
+    sessionStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -24,6 +26,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
       router.push({ name: 'Login', query: { redirect: router.currentRoute.value.fullPath } });
     }
     const message = error.response?.data?.message || '请求失败，请重试';
@@ -31,7 +34,7 @@ api.interceptors.response.use(
   },
 );
 
-// API functions
+// ---- Types ----
 
 export interface LoginPayload {
   username: string;
@@ -52,8 +55,14 @@ export interface ApplicationQuery {
   post_graduation_plan?: string;
 }
 
+// ---- API Functions ----
+
 export function login(data: LoginPayload) {
   return api.post('/auth/login', data);
+}
+
+export function fetchAuthMe() {
+  return api.get('/auth/me');
 }
 
 export function fetchApplications(params: ApplicationQuery) {
@@ -69,6 +78,10 @@ export function exportExcel(params: ApplicationQuery) {
     params,
     responseType: 'blob',
   });
+}
+
+export function updateApplicationNotes(id: string, notes: string) {
+  return api.patch(`/applications/${id}`, { notes });
 }
 
 export default api;

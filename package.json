@@ -13,7 +13,8 @@
     "build:h5": "npm run build -w packages/h5",
     "build:admin": "npm run build -w packages/admin",
     "db:migrate": "npm run db:migrate -w packages/server",
-    "db:seed": "npm run db:seed -w packages/server"
+    "db:seed": "npm run db:seed -w packages/server",
+    "test:server": "npm run test -w packages/server"
   },
   "engines": {
     "node": ">=18.0.0"

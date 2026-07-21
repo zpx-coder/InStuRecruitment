@@ -13,8 +13,10 @@ router.post('/auth/login', authCtrl.login);
 router.post('/applications', submissionLimiter, appCtrl.create);
 
 // Protected routes (admin only)
+router.get('/auth/me', authMiddleware, authCtrl.me);
 router.get('/applications', authMiddleware, appCtrl.list);
 router.get('/applications/export', authMiddleware, appCtrl.exportExcel);
+router.patch('/applications/:id', authMiddleware, appCtrl.update);
 router.get('/applications/:id', authMiddleware, appCtrl.detail);
 
 export default router;

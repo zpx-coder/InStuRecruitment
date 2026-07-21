@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 import config from '../config';
 
 /**
@@ -50,11 +51,16 @@ export function errorHandler(
     return;
   }
 
-  // Handle Zod validation errors (Phase 2)
-  if (err.name === 'ZodError') {
+  // Handle Zod validation errors with field-level details
+  if (err instanceof ZodError) {
+    const fieldErrors = err.errors.map((e) => ({
+      field: e.path.join('.'),
+      message: e.message,
+    }));
     res.status(422).json({
       success: false,
       message: 'Validation failed',
+      errors: fieldErrors,
     });
     return;
   }

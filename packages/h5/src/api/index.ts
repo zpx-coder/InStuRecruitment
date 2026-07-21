@@ -8,16 +8,28 @@ const api = axios.create({
   },
 });
 
-// Response interceptor
+// Response interceptor: unwrap data or extract error details
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const message = error.response?.data?.message || 'Network error, please try again.';
-    return Promise.reject(new Error(message));
+    const body = error.response?.data;
+    const message = body?.message || 'Network error, please try again.';
+
+    // Pass field-level errors if available (Zod validation response)
+    const err = new Error(message) as Error & {
+      status?: number;
+      fieldErrors?: Array<{ field: string; message: string }>;
+    };
+    err.status = error.response?.status;
+    if (body?.errors && Array.isArray(body.errors)) {
+      err.fieldErrors = body.errors;
+    }
+
+    return Promise.reject(err);
   },
 );
 
-// API functions
+// ---- Types ----
 
 export interface ApplicationPayload {
   name: string;
@@ -38,14 +50,39 @@ export interface ApplicationPayload {
   post_graduation_plan: string;
   intended_city: string;
   family_business: string;
+  expected_position: string;
 }
 
+export interface DictOption {
+  value: string;
+  label: string;
+}
+
+export interface DictOptions {
+  gender: DictOption[];
+  highest_degree: DictOption[];
+  hsk_level: DictOption[];
+  english_proficiency: DictOption[];
+  proficient_languages: DictOption[];
+  current_academic_year: DictOption[];
+  post_graduation_plan: DictOption[];
+}
+
+// ---- API Functions ----
+
 export function submitApplication(data: ApplicationPayload) {
-  return api.post('/applications', data);
+  return api.post('/applications', data) as Promise<{
+    success: boolean;
+    message: string;
+    id: string;
+  }>;
 }
 
 export function fetchDictOptions() {
-  return api.get('/dict/options');
+  return api.get('/dict/options') as Promise<{
+    success: boolean;
+    data: DictOptions;
+  }>;
 }
 
 export default api;

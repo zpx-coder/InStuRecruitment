@@ -76,6 +76,14 @@ export const applicationSchema = z.object({
   post_graduation_plan: postGraduationPlanEnum,
   intended_city: z.string().min(2).max(80),
   family_business: z.string().min(5).max(500),
+  expected_position: z.string().min(2).max(100),
 });
 
 export type ApplicationInput = z.infer<typeof applicationSchema>;
+
+// Partial update schema — only notes can be updated post-submission
+export const applicationUpdateSchema = z.object({
+  notes: z.string().max(2000).optional(),
+});
+
+export type ApplicationUpdateInput = z.infer<typeof applicationUpdateSchema>;

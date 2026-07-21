@@ -29,6 +29,7 @@ export async function createApplication(data: ApplicationInput) {
       postGraduationPlan: data.post_graduation_plan,
       intendedCity: data.intended_city,
       familyBusiness: data.family_business,
+      expectedPosition: data.expected_position,
     },
   });
 
@@ -133,6 +134,26 @@ export async function getApplication(id: string) {
   };
 }
 
+// ---- Update ----
+
+export async function updateApplication(id: string, data: { notes?: string }) {
+  const item = await prisma.application.findUnique({ where: { id } });
+  if (!item) return null;
+
+  const updated = await prisma.application.update({
+    where: { id },
+    data: {
+      notes: data.notes,
+    },
+  });
+
+  return {
+    ...updated,
+    passportNumber: decryptPassport(updated.passportNumber),
+    proficientLanguages: JSON.parse(updated.proficientLanguages),
+  };
+}
+
 // ---- Export Excel ----
 
 export async function exportApplications(query: ApplicationQuery): Promise<Buffer> {
@@ -181,6 +202,7 @@ export async function exportApplications(query: ApplicationQuery): Promise<Buffe
     { header: '毕业后计划', key: 'postGraduationPlan', width: 16 },
     { header: '意向城市/公司', key: 'intendedCity', width: 20 },
     { header: '家庭经营行业/意向产品', key: 'familyBusiness', width: 40 },
+    { header: '期望职位/服务', key: 'expectedPosition', width: 26 },
     { header: '提交时间', key: 'createdAt', width: 20 },
   ];
 

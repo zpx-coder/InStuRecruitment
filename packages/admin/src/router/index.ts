@@ -21,12 +21,24 @@ const router = createRouter({
   ],
 });
 
-// Auth guard (placeholder — will check JWT token in Phase 4)
+// Auth guard — check both localStorage and sessionStorage
 router.beforeEach((to, _from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token');
+    const token =
+      localStorage.getItem('token') ||
+      sessionStorage.getItem('token');
     if (!token) {
       next({ name: 'Login', query: { redirect: to.fullPath } });
+      return;
+    }
+  }
+  // If already logged in and going to /login, redirect to applications
+  if (to.name === 'Login') {
+    const token =
+      localStorage.getItem('token') ||
+      sessionStorage.getItem('token');
+    if (token) {
+      next({ name: 'Applications' });
       return;
     }
   }

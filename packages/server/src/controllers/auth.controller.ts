@@ -11,3 +11,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+
+export async function me(req: Request, res: Response) {
+  res.json({
+    success: true,
+    data: {
+      id: req.user!.sub,
+      username: req.user!.username,
+    },
+  });
+}
