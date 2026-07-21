@@ -13,3 +13,8 @@
 5. **项目开发计划** — 生成 5 阶段开发计划（Phase 0-5），总工时 ~64.5h。产出 `docs/dev-plan-v1.0.md`
 6. **H5 设计参考** — 分析 `H5UI.png` 设计稿，提取布局/配色/动效模式，适配品牌红
 7. **Phase 0 — 项目初始化** — Monorepo 骨架、Express+Prisma+SQLite 后端、Vue 3+Vant H5 前端、Vue 3+Element Plus Admin 前端、Docker Compose、README、Git 初始提交
+8. **Git 远程仓库配置** — 创建 GitHub `zpx-coder/InStuRecruitment` 仓库，配置 SSH remote 并推送
+
+## 2026-07-21
+
+1. **Phase 1 — 数据库与后端基础** — config 环境变量模块、Prisma 单例、AES-256-CBC 护照加解密工具、AppError + 全局错误处理中间件、app.ts 重构。加解密验证通过，服务器运行正常
