@@ -7,7 +7,27 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BannerSection: typeof import('./src/components/BannerSection.vue')['default']
+    CareerBackgroundSection: typeof import('./src/components/CareerBackgroundSection.vue')['default']
+    EducationSection: typeof import('./src/components/EducationSection.vue')['default']
+    FooterSection: typeof import('./src/components/FooterSection.vue')['default']
+    LanguagesSection: typeof import('./src/components/LanguagesSection.vue')['default']
+    PersonalInfoSection: typeof import('./src/components/PersonalInfoSection.vue')['default']
+    PrivacyConsent: typeof import('./src/components/PrivacyConsent.vue')['default']
+    ProcessSteps: typeof import('./src/components/ProcessSteps.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubmitButton: typeof import('./src/components/SubmitButton.vue')['default']
+    VanButton: typeof import('vant/es')['Button']
+    VanCell: typeof import('vant/es')['Cell']
+    VanCellGroup: typeof import('vant/es')['CellGroup']
+    VanCheckbox: typeof import('vant/es')['Checkbox']
+    VanCheckboxGroup: typeof import('vant/es')['CheckboxGroup']
+    VanDatePicker: typeof import('vant/es')['DatePicker']
+    VanField: typeof import('vant/es')['Field']
+    VanIcon: typeof import('vant/es')['Icon']
+    VanPicker: typeof import('vant/es')['Picker']
+    VanPopup: typeof import('vant/es')['Popup']
+    VanSearch: typeof import('vant/es')['Search']
   }
 }
