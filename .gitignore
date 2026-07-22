@@ -35,6 +35,9 @@ coverage/
 # Docker
 docker-data/
 
+# TypeScript
+*.tsbuildinfo
+
 # Temporary files
 *.tmp
 .cache/
