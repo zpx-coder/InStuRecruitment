@@ -10,7 +10,7 @@
 |----|------|------|--------|
 | H5 报名端 | 留学生 | English | Vue 3 + Vite + Vant 4 |
 | Admin 后台 | 管理员 | 中文 | Vue 3 + Vite + Element Plus |
-| API 服务 | — | — | Express.js + Prisma + SQLite/PostgreSQL |
+| API 服务 | — | — | Express.js + Prisma + MySQL 5.6 |
 
 ## 快速开始
 
@@ -18,7 +18,7 @@
 
 - Node.js ≥ 18
 - npm ≥ 9
-- （可选）Docker Desktop — 用于 PostgreSQL 本地环境
+- （可选）Docker Desktop — 用于 MySQL 本地环境
 
 ### 本地启动
 
@@ -28,7 +28,7 @@ npm install
 
 # 2. 配置环境变量
 cp packages/server/.env.example packages/server/.env
-# 编辑 .env 填入实际配置（默认 SQLite 可直接使用）
+# 编辑 .env 填入实际配置
 
 # 3. 初始化数据库
 npm run db:migrate
@@ -45,12 +45,12 @@ npm run dev:h5
 npm run dev:admin
 ```
 
-### Docker PostgreSQL（可选）
+### Docker MySQL（可选）
 
 ```bash
 docker-compose up -d
 # 然后将 .env 中 DATABASE_URL 改为：
-# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/yiwutrade"
+# DATABASE_URL="mysql://root:mysql@localhost:3306/yiwutrade"
 # 重新运行 npm run db:migrate
 ```
 
@@ -66,7 +66,7 @@ InStuRecruitment/
 │   ├── prd-v1.0.md      # 产品需求文档
 │   ├── dev-plan-v1.0.md # 项目开发计划
 │   └── assets/          # Logo、设计稿等静态资源
-├── docker-compose.yml   # 本地 PostgreSQL
+├── docker-compose.yml   # 本地 MySQL
 ├── CLAUDE.md            # 开发宪章
 └── Requirements.md      # 原始需求
 ```

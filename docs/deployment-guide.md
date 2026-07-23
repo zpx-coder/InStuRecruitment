@@ -1,7 +1,7 @@
 # YiwuTrade 留学生招聘系统 — 阿里云部署指引
 
 > 适用版本：v1.0  
-> 目标环境：阿里云 ECS + Nginx + PM2 + SQLite/PostgreSQL  
+> 目标环境：阿里云 ECS + Nginx + PM2 + MySQL 5.6  
 > 最后更新：2026-07-21
 
 ---
@@ -45,15 +45,14 @@
                                │
                                ▼
                       ┌──────────────────┐
-                      │  SQLite /        │
-                      │  PostgreSQL      │
+                      │  MySQL 5.6       │
                       └──────────────────┘
 ```
 
 - **H5 前端**：Vue 3 + Vant 4，纯静态文件，Nginx 直接托管
 - **Admin 后台**：Vue 3 + Element Plus，纯静态文件，Nginx 直接托管
 - **后端 API**：Express + Prisma，PM2 守护进程
-- **数据库**：SQLite（轻量起步）或 PostgreSQL（生产推荐）
+- **数据库**：MySQL 5.6
 
 ---
 
@@ -154,11 +153,8 @@ cp packages/server/.env.example packages/server/.env
 
 ```env
 # ---- 数据库 ----
-# SQLite（轻量，单机场景）
-DATABASE_URL="file:./dev.db"
-
-# PostgreSQL（生产推荐，需先搭建数据库）
-# DATABASE_URL="postgresql://user:password@host:5432/yiwutrade"
+# MySQL 5.6
+DATABASE_URL="mysql://root:mysql@localhost:3306/yiwutrade"
 
 # ---- JWT ----
 # ⚠️ 务必改为随机字符串（可用 openssl rand -hex 32 生成）
@@ -415,43 +411,41 @@ pm2 monit               # 实时监控面板
 
 ## 7. 数据库
 
-### 7.1 当前方案：SQLite
+### 7.1 当前方案：MySQL 5.6
 
-- 数据库文件位于 `packages/server/prisma/dev.db`
-- **优点**：零配置、免运维、单机场景完全够用
+- 数据库服务运行在 Docker 容器中（`docker-compose up -d`）
+- 连接字符串：`mysql://root:mysql@localhost:3306/yiwutrade`
 - **注意**：
-  - 定期备份 `dev.db` 文件
-  - 不支持并发写入（单实例 PM2 即可）
-  - 数据量 > 1GB 后建议迁移 PostgreSQL
+  - 生产环境务必修改 root 密码
+  - 定期备份数据库（`mysqldump`）
+  - MySQL 5.6 已于 2021 年 2 月停止官方安全更新，生产环境建议升级至 MySQL 8.0
 
-### 7.2 数据库备份（SQLite）
+### 7.2 数据库备份（MySQL）
 
 ```bash
+# 每日备份脚本
+mysqldump -u root -p yiwutrade > /backup/yiwutrade-$(date +\%Y\%m\%d).sql
+
 # 添加 crontab 定时备份（每天凌晨 3 点）
-0 3 * * * cp /var/www/yiwutrade/packages/server/prisma/dev.db /backup/yiwutrade-$(date +\%Y\%m\%d).db
+0 3 * * * mysqldump -u root -p<password> yiwutrade > /backup/yiwutrade-$(date +\%Y\%m\%d).sql
 ```
 
-### 7.3 升级到 PostgreSQL（可选）
+### 7.3 阿里云 RDS MySQL（可选）
 
-1. 在阿里云创建 **云数据库 RDS PostgreSQL** 实例（或自建）
+如需使用阿里云托管数据库：
+
+1. 在阿里云创建 **云数据库 RDS MySQL 5.6** 实例
 2. 修改 `DATABASE_URL`：
    ```env
-   DATABASE_URL="postgresql://user:password@pg-xxx.rds.aliyuncs.com:5432/yiwutrade"
+   DATABASE_URL="mysql://user:password@rm-xxx.mysql.rds.aliyuncs.com:3306/yiwutrade"
    ```
-3. 修改 `prisma/schema.prisma` 中的 `datasource db`：
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-4. 重新运行迁移：
+3. 运行迁移：
    ```bash
    cd packages/server
    npx prisma migrate deploy
    npx tsx prisma/seed.ts
    ```
-5. PM2 重启：
+4. PM2 重启：
    ```bash
    pm2 restart yiwutrade-api
    ```
@@ -504,7 +498,7 @@ sudo certbot renew --dry-run   # 测试
 | 页面空白 | SPA fallback 未生效 | 检查 Nginx `try_files` 配置 |
 | API CORS 错误 | CORS_ORIGIN 未包含当前域名 | 更新 `.env` 中 `CORS_ORIGIN`，重启 PM2 |
 | 登录失败 | 数据库未迁移 / seed 未执行 | 重跑 `prisma migrate deploy` 和 `seed.ts` |
-| 数据库锁定 (SQLITE_BUSY) | 多进程同时写入 SQLite | PM2 使用单实例 `instances: 1` |
+| 数据库连接失败 | MySQL 服务未启动或连接串错误 | 检查 Docker 容器状态及 `DATABASE_URL` |
 | 静态资源 404 | 构建产物路径不对 | 检查 Nginx `root` 指向 `<package>/dist/` |
 
 ### 9.3 日志排查
@@ -550,7 +544,7 @@ pm2 restart yiwutrade-api
 
 | 备份内容 | 频率 | 方式 |
 |----------|------|------|
-| SQLite 数据库 | 每日 | `cp` + crontab |
+| MySQL 数据库 | 每日 | `mysqldump` + crontab |
 | 环境变量文件 | 变更时 | Git 仓库外单独保存 |
 | Nginx 配置 | 变更时 | 版本控制或注释记录 |
 
